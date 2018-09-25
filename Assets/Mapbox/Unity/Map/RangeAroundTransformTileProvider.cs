@@ -3,26 +3,20 @@
 	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections.Generic;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		//[SerializeField]
-		//private Transform _targetTransform;
-
-		//[SerializeField]
-		//private int _visibleBuffer;
-
-		//[SerializeField]
-		//private int _disposeBuffer;
-
-		RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
+		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
-		private int _counter;
+
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -38,13 +32,19 @@
 				_initialized = true;
 			}
 			_cachedTile = new UnwrappedTileId();
+			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+			_map.OnInitialized += UpdateTileExtent;
+			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		private void Update()
+		public override void UpdateTileExtent()
 		{
 			if (!_initialized) return;
 
-			_currentTile = TileCover.CoordinateToTileId(_rangeTileProviderOptions.targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.AbsoluteZoom);
+			_currentExtent.activeTiles.Clear();
+			//_toRemove.Clear();
+			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
@@ -52,27 +52,21 @@
 				{
 					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 					{
-						AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+						_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
-				Cleanup(_currentTile);
+				OnExtentChanged();
 			}
 		}
 
-		private void Cleanup(UnwrappedTileId currentTile)
+		public virtual void Update()
 		{
-			var _activeTilesKeys = _activeTiles.Keys.ToList();
-			foreach (var tile in _activeTilesKeys)
+			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && _rangeTileProviderOptions.targetTransform.hasChanged)
 			{
-				bool dispose = false;
-				dispose = tile.X > currentTile.X + _rangeTileProviderOptions.disposeBuffer || tile.X < _currentTile.X - _rangeTileProviderOptions.disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _rangeTileProviderOptions.disposeBuffer || tile.Y < _currentTile.Y - _rangeTileProviderOptions.disposeBuffer;
+				UpdateTileExtent();
+				_rangeTileProviderOptions.targetTransform.hasChanged = false;
 
-				if (dispose)
-				{
-					RemoveTile(tile);
-				}
 			}
 		}
 	}

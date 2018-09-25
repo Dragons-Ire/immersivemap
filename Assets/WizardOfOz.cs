@@ -12,11 +12,12 @@ public class WizardOfOz : MonoBehaviour {
 	public List<GameObject> annotations;
     public Camera zed;
     int count;
+    int currentMarker;
     float timer;
     //InitParameters init_params;
     // Use this for initialization
     void Start () {
-        count = -1;
+        count = 0;
         mainCamera = GameObject.FindWithTag("MainCamera");
         //init_params.resolution = RESOLUTION_HD720;
         //init_params.coordinateSystem = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
@@ -64,12 +65,12 @@ public class WizardOfOz : MonoBehaviour {
 		if (Input.GetKey (KeyCode.UpArrow))
 		{
 			//Up
-			height = 0.01f;
+			height = 0.1f;
 		}
 		if (Input.GetKey (KeyCode.DownArrow))
 		{
 			//Down
-			height = -0.01f;
+			height = -0.1f;
 		}
 
 		float zoomChange = 0.0f;
@@ -87,40 +88,38 @@ public class WizardOfOz : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Space))
 		{
             timer = 3;
+            if (count >= annotations.Count)
+            {
+                count = 0;
+            }
+            currentMarker = count;
             count += 1;
-            Component light = annotations[0].GetComponent("Light");
-            light.GetType().GetProperty("enabled").SetValue(light, true, null);
-            Component halo = annotations[0].GetComponent("Halo");
-            halo.GetType().GetProperty("enabled").SetValue(halo, true, null);
-            annotations[0].SetActive(true);
+            //Component light = annotations[currentMarker].transform.GetChild(1).GetComponent("Light");
+            //light.GetType().GetProperty("enabled").SetValue(light, true, null);
+            annotations[currentMarker].SetActive(true);
 			//Vector3 annotationPosition = new Vector3(Random.Range(gameObject.transform.position.x - 2.5f, gameObject.transform.position.x + 2.5f), yPosition + 0.1f, Random.Range(gameObject.transform.position.z - 2.5f, gameObject.transform.position.z + 2.5f));
 			//annotations.Add((Transform)Instantiate(annotationPrefab, annotationPosition, Quaternion.identity));
 		}
 
-		if (Input.GetKeyDown (KeyCode.M))
+		if (Input.GetKeyDown (KeyCode.R))
 		{
-            //foreach(GameObject annotation in annotations)
-            //{
-            //    Component light = annotation.GetComponent("Light");
-            //    light.GetType().GetProperty("enabled").SetValue(light, false, null);
-            //    Component halo = annotation.GetComponent("Halo");
-            //    halo.GetType().GetProperty("enabled").SetValue(halo, false, null);
-            //    annotation.SetActive(false);
-            //}
-            //count = -1;
-			//annotations [Random.Range (0, annotations.Count)].GetComponent<MeshRenderer>().material = selectedMaterial;
+            foreach(GameObject annotation in annotations)
+            {
+                //Component light = annotation.transform.GetChild(1).GetComponent("Light");
+                //light.GetType().GetProperty("enabled").SetValue(light, false, null);
+                annotation.SetActive(false);
+            }
 		}
 
         timer -= Time.deltaTime;
         if(timer <= 0)
         {
-            Component light = annotations[0].GetComponent("Light");
-            light.GetType().GetProperty("enabled").SetValue(light, false, null);
-            Component halo = annotations[0].GetComponent("Halo");
-            halo.GetType().GetProperty("enabled").SetValue(halo, false, null);
+            //Component light = annotations[currentMarker].transform.GetChild(1).GetComponent("Light");
+            //light.GetType().GetProperty("enabled").SetValue(light, false, null);
         }
 
-		zoom += zoomChange;
+        //zoom += zoomChange;
+        gameObject.transform.localScale += new Vector3(zoomChange, zoomChange, zoomChange);
 
 		Mapbox.Utils.Vector2d mapboxMovement = new Mapbox.Utils.Vector2d (movement.z, movement.x);
 		attachment.UpdateMap (attachment.CenterLatitudeLongitude - (mapboxMovement), zoom);
