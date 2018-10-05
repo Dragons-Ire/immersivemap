@@ -10,14 +10,19 @@ public class WizardOfOz : MonoBehaviour {
     GameObject mainCamera;
 	public Material selectedMaterial;
 	public List<GameObject> annotations;
-    public Camera zed;
+    public GameObject zed;
     int count;
     int currentMarker;
     float timer;
+    float changeHeight;
     //InitParameters init_params;
     // Use this for initialization
     void Start () {
         count = 0;
+        float zedHeight = zed.transform.position.y;
+
+        changeHeight = yPosition;
+
         mainCamera = GameObject.FindWithTag("MainCamera");
         //init_params.resolution = RESOLUTION_HD720;
         //init_params.coordinateSystem = COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
@@ -65,12 +70,12 @@ public class WizardOfOz : MonoBehaviour {
 		if (Input.GetKey (KeyCode.UpArrow))
 		{
 			//Up
-			height = 0.1f;
+			height = 0.01f;
 		}
 		if (Input.GetKey (KeyCode.DownArrow))
 		{
 			//Down
-			height = -0.1f;
+			height = -0.01f;
 		}
 
 		float zoomChange = 0.0f;
@@ -124,13 +129,15 @@ public class WizardOfOz : MonoBehaviour {
 		Mapbox.Utils.Vector2d mapboxMovement = new Mapbox.Utils.Vector2d (movement.z, movement.x);
 		attachment.UpdateMap (attachment.CenterLatitudeLongitude - (mapboxMovement), zoom);
 
-		yPosition += height;
+        changeHeight += height;
+
+        yPosition = changeHeight;
 
 		Vector3 temp = new Vector3 (gameObject.transform.position.x, yPosition, gameObject.transform.position.z);
 		gameObject.transform.position = temp;
 
 		float currentAngle = attachment.transform.eulerAngles.y;
-        Vector3 zedMiniPosition = new Vector3(zed.gameObject.transform.position.x, attachment.transform.position.y, zed.gameObject.transform.position.z);
+        Vector3 zedMiniPosition = new Vector3(zed.transform.position.x, attachment.transform.position.y, zed.transform.position.z);
         Vector3 targetLocation = (Quaternion.Euler (0, angle, 0) * (attachment.transform.position - zedMiniPosition))  + zedMiniPosition;
 		attachment.transform.SetPositionAndRotation(targetLocation, Quaternion.Euler(0, (currentAngle + angle), 0));
 	}
