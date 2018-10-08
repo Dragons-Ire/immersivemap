@@ -79,18 +79,31 @@ public class WizardOfOz : MonoBehaviour {
 		}
 
 		float zoomChange = 0.0f;
+        bool zooming = false;
 		if (Input.GetKey (KeyCode.LeftArrow))
 		{
 			//Out
-			zoomChange = -0.01f;
+			zoomChange = 0.15f;
+            zooming = true;
 		}
 		if (Input.GetKey (KeyCode.RightArrow))
 		{
 			//In
-			zoomChange = 0.01f;
+			zoomChange = 0.5f;
+            zooming = true;
 		}
 
-		if (Input.GetKeyDown (KeyCode.Space))
+        if (zooming)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(zoomChange, zoomChange, zoomChange), 0.2f * Time.deltaTime);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+
+        }
+
+		/*/if (Input.GetKeyDown (KeyCode.Space))
 		{
             timer = 3;
             if (count >= annotations.Count)
@@ -104,9 +117,9 @@ public class WizardOfOz : MonoBehaviour {
             annotations[currentMarker].SetActive(true);
 			//Vector3 annotationPosition = new Vector3(Random.Range(gameObject.transform.position.x - 2.5f, gameObject.transform.position.x + 2.5f), yPosition + 0.1f, Random.Range(gameObject.transform.position.z - 2.5f, gameObject.transform.position.z + 2.5f));
 			//annotations.Add((Transform)Instantiate(annotationPrefab, annotationPosition, Quaternion.identity));
-		}
+		}/*/
 
-		if (Input.GetKeyDown (KeyCode.R))
+		/*/if (Input.GetKeyDown (KeyCode.R))
 		{
             foreach(GameObject annotation in annotations)
             {
@@ -114,7 +127,7 @@ public class WizardOfOz : MonoBehaviour {
                 //light.GetType().GetProperty("enabled").SetValue(light, false, null);
                 annotation.SetActive(false);
             }
-		}
+		}/*/
 
         timer -= Time.deltaTime;
         if(timer <= 0)
@@ -124,9 +137,9 @@ public class WizardOfOz : MonoBehaviour {
         }
 
         //zoom += zoomChange;
-        gameObject.transform.localScale += new Vector3(zoomChange, zoomChange, zoomChange);
+        //gameObject.transform.localScale += new Vector3(zoomChange, zoomChange, zoomChange);
 
-		Mapbox.Utils.Vector2d mapboxMovement = new Mapbox.Utils.Vector2d (movement.z, movement.x);
+        Mapbox.Utils.Vector2d mapboxMovement = new Mapbox.Utils.Vector2d (movement.z, movement.x);
 		attachment.UpdateMap (attachment.CenterLatitudeLongitude - (mapboxMovement), zoom);
 
         changeHeight += height;
