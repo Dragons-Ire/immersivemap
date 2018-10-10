@@ -36,34 +36,34 @@ public class WizardOfOz : MonoBehaviour {
 		if (Input.GetKey(KeyCode.W))
 		{
 			//North
-			movement.z = -0.0001f;
+			movement.z = -0.00005f;
 		}
 		if (Input.GetKey(KeyCode.S))
 		{
 			//South
-			movement.z = 0.0001f;
+			movement.z = 0.00005f;
 		}
 		if (Input.GetKey(KeyCode.A))
 		{
 			//West
-			movement.x = 0.0001f;
+			movement.x = 0.00005f;
 		}
 		if (Input.GetKey(KeyCode.D))
 		{
 			//East
-			movement.x = -0.0001f;
+			movement.x = -0.00005f;
 		}
 
 		float angle = 0.0f;
 		if (Input.GetKey (KeyCode.Q))
 		{
 			//Anti-Clockwise
-			angle = 1.0f;
+			angle = 0.8f;
 		}
 		if (Input.GetKey (KeyCode.E))
 		{
 			//Clockwise
-			angle = -1.0f;
+			angle = -0.8f;
 		}
 
 		float height = 0.0f;
@@ -82,20 +82,30 @@ public class WizardOfOz : MonoBehaviour {
         bool zooming = false;
 		if (Input.GetKey (KeyCode.LeftArrow))
 		{
-			//Out
-			zoomChange = 0.15f;
-            zooming = true;
-		}
+            //Out
+            if (transform.localScale.x > 0.15f)
+            {
+                zoomChange = -0.1f;
+                zooming = true;
+            }
+            //transform.localScale = Vector3.Lerp(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.15f, 0.15f, 0.15f), 0.2f * Time.deltaTime);
+            
+        }
 		if (Input.GetKey (KeyCode.RightArrow))
 		{
-			//In
-			zoomChange = 0.5f;
-            zooming = true;
-		}
+            //In
+            if (transform.localScale.x < 0.5f)
+            {
+                zoomChange = 0.1f;
+                zooming = true;
+            }
+            //transform.localScale = Vector3.Lerp(new Vector3(0.15f, 0.15f, 0.15f), new Vector3(0.5f, 0.5f, 0.5f), 0.2f * Time.deltaTime);
+        }
 
         if (zooming)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(zoomChange, zoomChange, zoomChange), 0.2f * Time.deltaTime);
+            transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime * zoomChange;
+            //transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(zoomChange, zoomChange, zoomChange), 0.2f * Time.deltaTime);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
