@@ -80,6 +80,7 @@ public class WizardOfOz : MonoBehaviour {
 
 		float zoomChange = 0.0f;
         bool zooming = false;
+        float percentageChange = 0.0f;
 		if (Input.GetKey (KeyCode.LeftArrow))
 		{
             //Out
@@ -87,6 +88,7 @@ public class WizardOfOz : MonoBehaviour {
             {
                 zoomChange = -0.1f;
                 zooming = true;
+                
             }
             //transform.localScale = Vector3.Lerp(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.15f, 0.15f, 0.15f), 0.2f * Time.deltaTime);
             
@@ -98,13 +100,32 @@ public class WizardOfOz : MonoBehaviour {
             {
                 zoomChange = 0.1f;
                 zooming = true;
+                
             }
             //transform.localScale = Vector3.Lerp(new Vector3(0.15f, 0.15f, 0.15f), new Vector3(0.5f, 0.5f, 0.5f), 0.2f * Time.deltaTime);
         }
 
         if (zooming)
         {
+            Vector3 difference = transform.localPosition - zed.transform.localPosition;
+            Vector3 finalPosition = zed.transform.localPosition;
+            float currentSize = transform.localScale.x;
             transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime * zoomChange;
+            if (zoomChange < 0)
+            {
+                percentageChange = currentSize / (transform.localScale.x);
+                finalPosition += difference / (percentageChange);
+            }
+            else
+            {
+                percentageChange = (transform.localScale.x) / currentSize;
+                finalPosition += difference * (percentageChange);
+            }
+            Debug.Log(percentageChange);
+            Debug.Log(difference);
+            Debug.Log(finalPosition);
+            
+            transform.localPosition = finalPosition;
             //transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(zoomChange, zoomChange, zoomChange), 0.2f * Time.deltaTime);
         }
 
