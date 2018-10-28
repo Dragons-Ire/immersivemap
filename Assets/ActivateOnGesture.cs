@@ -26,10 +26,11 @@ public class ActivateOnGesture : MonoBehaviour {
         {
             return;
         }
-
+        //Debug.Log("HELLO");
         HandPoseType pose = gestureRecognitionController.GetDominantHandPose(isLeftHanded);
-        if (pose.Equals(handPoseType))
+        if (gestureRecognitionController.IsHandPinching(gestureRecognitionController.rightHand))
         {
+            //Debug.Log("HELLO");
 			action = true;
             GrabAction();
         }
@@ -68,7 +69,7 @@ public class ActivateOnGesture : MonoBehaviour {
 
 				Vector3 movement = Quaternion.AngleAxis (angle, Vector3.up) * gestureRecognitionController.GetDominantVelocity (isLeftHanded);
 				Mapbox.Utils.Vector2d mapboxMovement = new Mapbox.Utils.Vector2d(movement.z, movement.x);
-				attachment.UpdateMap (attachment.CenterLatitudeLongitude - (mapboxMovement * 0.001f), attachment.Zoom);
+				attachment.UpdateMap (attachment.CenterLatitudeLongitude - (mapboxMovement * 0.0005f), attachment.Zoom);
 			}
 			else if (actionType == 1)
 			{
